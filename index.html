@@ -10,35 +10,23 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 <style>
 :root {
-  --color-bg: #ffffff;
-  --color-bg2: #f5f5f4;
-  --color-bg3: #e8e7e4;
-  --color-text: #1c1917;
-  --color-text2: #78716c;
-  --color-text3: #a8a29e;
-  --color-border: #e7e5e4;
-  --color-border2: #d6d3d1;
+  --color-bg: #ffffff; --color-bg2: #f5f5f4; --color-bg3: #e8e7e4;
+  --color-text: #1c1917; --color-text2: #78716c; --color-text3: #a8a29e;
+  --color-border: #e7e5e4; --color-border2: #d6d3d1;
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --radius: 12px;
-  --radius-sm: 8px;
+  --radius: 12px; --radius-sm: 8px;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #1c1917;
-    --color-bg2: #292524;
-    --color-bg3: #3c3836;
-    --color-text: #fafaf9;
-    --color-text2: #a8a29e;
-    --color-text3: #78716c;
-    --color-border: #3c3836;
-    --color-border2: #57534e;
+    --color-bg: #1c1917; --color-bg2: #292524; --color-bg3: #3c3836;
+    --color-text: #fafaf9; --color-text2: #a8a29e; --color-text3: #78716c;
+    --color-border: #3c3836; --color-border2: #57534e;
   }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: var(--font); background: var(--color-bg); color: var(--color-text); min-height: 100dvh; }
 input, select, textarea, button { font-family: var(--font); color: var(--color-text); background: var(--color-bg2); border: 0.5px solid var(--color-border); border-radius: var(--radius-sm); padding: 8px 10px; outline: none; }
 input:focus, select:focus, textarea:focus { border-color: var(--color-border2); }
-
 .app { padding: 1rem; max-width: 480px; margin: 0 auto; }
 .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
 .header h1 { font-size: 18px; font-weight: 600; }
@@ -48,7 +36,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 .tab { flex-shrink: 0; padding: 8px 10px; font-size: 13px; font-weight: 500; color: var(--color-text2); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -0.5px; white-space: nowrap; }
 .tab.active { color: var(--color-text); border-bottom-color: var(--color-text); }
 .search-wrap { position: relative; margin-bottom: 1rem; }
-.search-input { width: 100%; font-size: 14px; padding-left: 36px; padding-right: 36px; background: var(--color-bg2); }
+.search-input { width: 100%; font-size: 14px; padding-left: 36px; padding-right: 36px; }
 .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text3); font-size: 16px; pointer-events: none; }
 .search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--color-text3); font-size: 16px; padding: 0; display: none; }
 .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
@@ -77,7 +65,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 .st-done { background: #EAF3DE; color: #3B6D11; }
 .st-reading { background: #FAEEDA; color: #854F0B; }
 .st-want { background: #F1EFE8; color: #5F5E5A; }
-.delete-btn { background: none; border: none; cursor: pointer; color: var(--color-text3); font-size: 16px; padding: 0; }
+.card-actions { display: flex; gap: 8px; }
+.edit-btn, .delete-btn { background: none; border: none; cursor: pointer; color: var(--color-text3); font-size: 16px; padding: 0; }
+.edit-btn:active, .delete-btn:active { opacity: 0.5; }
 .card-review { margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--color-border); font-size: 13px; color: var(--color-text2); line-height: 1.7; white-space: pre-wrap; }
 .empty { text-align: center; padding: 3rem 1rem; color: var(--color-text2); font-size: 14px; line-height: 1.7; }
 .search-result-count { font-size: 12px; color: var(--color-text2); margin-bottom: 10px; }
@@ -87,7 +77,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 .status-section-count { font-size: 12px; color: var(--color-text2); background: var(--color-bg2); padding: 2px 8px; border-radius: 999px; }
 .ai-btn-row { display: flex; flex-direction: column; gap: 10px; }
 .ai-btn { width: 100%; padding: 12px; border-radius: var(--radius); border: 0.5px solid var(--color-border); background: var(--color-bg2); font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.ai-btn:active { opacity: 0.7; }
 .ai-result { margin-top: 1rem; background: var(--color-bg2); border-radius: var(--radius); padding: 16px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
 .ai-result-label { font-size: 11px; color: var(--color-text2); margin-bottom: 8px; }
 .loading-dots { display: inline-flex; gap: 4px; align-items: center; }
@@ -171,7 +160,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 <div class="app">
   <div class="header">
     <h1>내 목록</h1>
-    <button class="add-btn" id="open-modal-btn" aria-label="항목 추가"><i class="ti ti-plus"></i></button>
+    <button class="add-btn" id="open-modal-btn"><i class="ti ti-plus"></i></button>
   </div>
   <div class="tab-row" id="tab-row">
     <button class="tab active" data-tab="list">전체 목록</button>
@@ -235,8 +224,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   </div>
 
   <div id="view-contest" style="display:none;">
-    <p class="contest-intro">버튼을 누르면 Claude가 현재 진행 중인 공모전을 검색해서 정리해드려요.</p>
-    <div class="contest-btn-row" id="contest-btn-row">
+    <p class="contest-intro">버튼을 누르면 AI가 현재 진행 중인 공모전을 정리해드려요.</p>
+    <div class="contest-btn-row">
       <button class="contest-btn" data-contestbtn="all"><i class="ti ti-trophy"></i> 전국 문학 공모전 전체</button>
       <button class="contest-btn" data-contestbtn="novel"><i class="ti ti-book"></i> 소설 · 단편 공모전</button>
       <button class="contest-btn" data-contestbtn="essay"><i class="ti ti-writing"></i> 수필 · 에세이 공모전</button>
@@ -246,7 +235,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     <div id="contest-result"></div>
     <div class="contest-notice">
       <div class="contest-notice-title">안내</div>
-      버튼을 누르면 AI가 현재 접수 중인 공모전을 웹 검색 없이 알려드려요. 정확한 마감일은 각 기관 공식 사이트에서 꼭 확인하세요.
+      정확한 마감일은 각 기관 공식 사이트에서 꼭 확인하세요.
     </div>
   </div>
 
@@ -263,7 +252,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 
 <div class="modal-bg" id="modal-bg">
   <div class="modal">
-    <h2>새 항목 추가</h2>
     <h2 id="modal-title">새 항목 추가</h2>
     <div class="field"><label>제목</label><input type="text" id="inp-title" placeholder="제목을 입력하세요" /></div>
     <div class="field"><label>카테고리</label>
@@ -307,36 +295,24 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   const BOOK_COLORS=['#378ADD','#1D9E75','#7F77DD','#D85A30','#BA7517','#993556'];
   const BOOK_GENRES=['소설','수필','시','자기계발','인문','역사','과학','철학','경제경영','사회','여행','아동','만화','기타'];
   const VIDEO_GENRES=['드라마','로맨스','코미디','스릴러','공포','액션','SF','판타지','미스터리','다큐','애니','범죄','역사','전쟁','가족'];
+  const STORAGE_KEY='my-list-items-v1';
 
-  const STORAGE_KEY = 'my-list-items-v1';
+  function loadItems(){try{const r=localStorage.getItem(STORAGE_KEY);return r?JSON.parse(r):getDefault();}catch{return getDefault();}}
+  function saveItems(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(items));}catch{}}
+  function getDefault(){return[
+    {id:1,title:'파친코',cat:'book',status:'done',author:'이민진',director:'',actors:[],genres:['소설'],date:'2024-03-01',dateEnd:'2024-03-10',review:'세대를 가로지르는 이야기인데, 읽는 내내 숨이 막혔다.'},
+    {id:2,title:'채식주의자',cat:'book',status:'done',author:'한강',director:'',actors:[],genres:['소설'],date:'2024-06-15',dateEnd:'2024-06-20',review:''},
+    {id:3,title:'나의 해방일지',cat:'drama',status:'done',author:'',director:'박해영',actors:['손석구','이지은'],genres:['드라마','로맨스'],date:'2023-11-05',dateEnd:'',review:'염미정의 대사들이 오래 남았다.'},
+    {id:4,title:'작은 땅의 야수들',cat:'book',status:'done',author:'김주혜',director:'',actors:[],genres:['소설'],date:'2025-01-05',dateEnd:'2025-01-14',review:''},
+    {id:5,title:'콘크리트 유토피아',cat:'movie',status:'want',author:'',director:'엄태화',actors:['이병헌','박서준','박보영'],genres:['드라마','SF'],date:'',dateEnd:'',review:''},
+    {id:6,title:'남아있는 나날',cat:'book',status:'reading',author:'가즈오 이시구로',director:'',actors:[],genres:['소설'],date:'2025-05-01',dateEnd:'',review:''},
+  ];}
 
-  function loadItems() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : getDefaultItems();
-    } catch { return getDefaultItems(); }
-  }
-
-  function saveItems() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch {}
-  }
-
-  function getDefaultItems() {
-    return [
-      {id:1,title:'파친코',cat:'book',status:'done',author:'이민진',director:'',actors:[],genres:['소설'],date:'2024-03-01',dateEnd:'2024-03-10',review:'세대를 가로지르는 이야기인데, 읽는 내내 숨이 막혔다.'},
-      {id:2,title:'채식주의자',cat:'book',status:'done',author:'한강',director:'',actors:[],genres:['소설'],date:'2024-06-15',dateEnd:'2024-06-20',review:''},
-      {id:3,title:'나의 해방일지',cat:'drama',status:'done',author:'',director:'박해영',actors:['손석구','이지은'],genres:['드라마','로맨스'],date:'2023-11-05',dateEnd:'',review:'염미정의 대사들이 오래 남았다.'},
-      {id:4,title:'작은 땅의 야수들',cat:'book',status:'done',author:'김주혜',director:'',actors:[],genres:['소설'],date:'2025-01-05',dateEnd:'2025-01-14',review:''},
-      {id:5,title:'콘크리트 유토피아',cat:'movie',status:'want',author:'',director:'엄태화',actors:['이병헌','박서준','박보영'],genres:['드라마','SF'],date:'',dateEnd:'',review:''},
-      {id:6,title:'남아있는 나날',cat:'book',status:'reading',author:'가즈오 이시구로',director:'',actors:[],genres:['소설'],date:'2025-05-01',dateEnd:'',review:''},
-    ];
-  }
-
-  let items = loadItems();
-  let nextId = Math.max(...items.map(i=>i.id), 0) + 1;
-  let filter='all', activeTab='list', creatorTab='all', listQ='', creatorQ='';
-  let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), selectedDate=null;
-  let selectedGenres=[];
+  let items=loadItems();
+  let nextId=Math.max(...items.map(i=>i.id),0)+1;
+  let filter='all',activeTab='list',creatorTab='all',listQ='',creatorQ='';
+  let calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),selectedDate=null;
+  let selectedGenres=[],editingId=null;
 
   const catLabel={book:'📖 책',movie:'🎬 영화',drama:'📺 드라마'};
   const catClass={book:'cat-book',movie:'cat-movie',drama:'cat-drama'};
@@ -353,16 +329,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   function highlight(text,q){if(!q)return text;const idx=text.toLowerCase().indexOf(q.toLowerCase());if(idx<0)return text;return text.slice(0,idx)+`<mark>${text.slice(idx,idx+q.length)}</mark>`+text.slice(idx+q.length);}
   function isBookCat(cat){return cat==='book';}
   function getBookColor(id){const books=items.filter(i=>i.cat==='book'&&(i.date||i.dateEnd));const idx=books.findIndex(i=>i.id===id);return BOOK_COLORS[idx%BOOK_COLORS.length];}
-
-  function buildListText(src){
-    return(src||items).map(i=>`- ${i.title} (${catLabel[i.cat]}, ${stLabel[i.status]}${i.author?', 작가:'+i.author:''}${i.director?', 감독:'+i.director:''}${i.actors&&i.actors.length?', 출연:'+i.actors.join('·'):''}${i.genres&&i.genres.length?', 장르:'+i.genres.join('·'):''}${i.date?', '+fmtDate(i.date):''}${i.review?'\n  감상: '+i.review:''})`).join('\n');
-  }
-
-  function matchesQ(i,q){
-    if(!q)return true;
-    const lq=q.toLowerCase();
-    return i.title.toLowerCase().includes(lq)||(i.author||'').toLowerCase().includes(lq)||(i.director||'').toLowerCase().includes(lq)||(i.actors||[]).some(a=>a.toLowerCase().includes(lq))||(i.genres||[]).some(g=>g.toLowerCase().includes(lq));
-  }
+  function buildListText(src){return(src||items).map(i=>`- ${i.title} (${catLabel[i.cat]}, ${stLabel[i.status]}${i.author?', 작가:'+i.author:''}${i.director?', 감독:'+i.director:''}${i.actors&&i.actors.length?', 출연:'+i.actors.join('·'):''}${i.genres&&i.genres.length?', 장르:'+i.genres.join('·'):''}${i.date?', '+fmtDate(i.date):''}${i.review?'\n  감상: '+i.review:''})`).join('\n');}
+  function matchesQ(i,q){if(!q)return true;const lq=q.toLowerCase();return i.title.toLowerCase().includes(lq)||(i.author||'').toLowerCase().includes(lq)||(i.director||'').toLowerCase().includes(lq)||(i.actors||[]).some(a=>a.toLowerCase().includes(lq))||(i.genres||[]).some(g=>g.toLowerCase().includes(lq));}
 
   function cardHTML(item,hideStatus,q){
     const creator=getCreatorDisplay(item);
@@ -381,29 +349,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
       </div>
       <div class="card-right">
         ${!hideStatus?`<span class="status-badge ${stClass[item.status]}">${stLabel[item.status]}</span>`:''}
-        <button class="edit-btn" data-edit="${item.id}" aria-label="수정"><i class="ti ti-pencil"></i></button>
-        <button class="delete-btn" data-id="${item.id}" aria-label="삭제"><i class="ti ti-trash"></i></button>
-        .edit-btn { background: none; border: none; cursor: pointer; color: var(--color-text3); font-size: 16px; padding: 0; }
-      </div>
-    </div>${item.review?`<div class="card-review">${item.review}</div>`:''}</div>`;
-  }
-    const creator=getCreatorDisplay(item);
-    const genres=item.genres||[];
-    const tagCls=isBookCat(item.cat)?'genre-tag-book':'genre-tag-video';
-    return`<div class="card"><div class="card-top">
-      <div class="cat-badge ${catClass[item.cat]}">${catLabel[item.cat]}</div>
-      <div class="card-body">
-        <div class="card-title">${q?highlight(item.title,q):item.title}</div>
-        <div class="card-sub">
-          ${creator?`<span>${creator}</span>`:''}
-          ${creator&&item.date?`<span>·</span>`:''}
-          ${item.date?`<span>${fmtDate(item.date)}${item.dateEnd?' ~ '+fmtDate(item.dateEnd):''}</span>`:''}
+        <div class="card-actions">
+          <button class="edit-btn" data-edit="${item.id}"><i class="ti ti-pencil"></i></button>
+          <button class="delete-btn" data-id="${item.id}"><i class="ti ti-trash"></i></button>
         </div>
-        ${genres.length?`<div class="card-genres">${genres.map(g=>`<span class="genre-tag ${tagCls}">${g}</span>`).join('')}</div>`:''}
-      </div>
-      <div class="card-right">
-        ${!hideStatus?`<span class="status-badge ${stClass[item.status]}">${stLabel[item.status]}</span>`:''}
-        <button class="delete-btn" data-id="${item.id}"><i class="ti ti-trash"></i></button>
       </div>
     </div>${item.review?`<div class="card-review">${item.review}</div>`:''}</div>`;
   }
@@ -445,23 +394,18 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
       if(creatorTab==='all'||creatorTab==='author'){if(i.author)roles.push({name:i.author,role:'작가',item:i});}
       if(creatorTab==='all'||creatorTab==='director'){if(i.director)roles.push({name:i.director,role:'감독',item:i});}
       if(creatorTab==='all'||creatorTab==='actor'){(i.actors||[]).forEach(a=>roles.push({name:a,role:'배우',item:i}));}
-      roles.forEach(({name,role,item})=>{
-        if(q&&!name.toLowerCase().includes(q))return;
-        if(!grouped[name])grouped[name]={role,works:[]};
-        grouped[name].works.push(item);
-      });
+      roles.forEach(({name,role,item})=>{if(q&&!name.toLowerCase().includes(q))return;if(!grouped[name])grouped[name]={role,works:[]};grouped[name].works.push(item);});
     });
     const roleIcon={작가:'✍️',감독:'🎬',배우:'🌟'};
     const entries=Object.entries(grouped).sort((a,b)=>b[1].works.length-a[1].works.length);
     if(!entries.length){document.getElementById('creator-list').innerHTML=`<div class="no-result">${q?`"${q}" 검색 결과가 없어요`:'정보가 없어요<br><br>항목 추가 시 작가·감독·배우를<br>입력하면 여기서 볼 수 있어요'}</div>`;return;}
     document.getElementById('creator-list').innerHTML=entries.map(([name,{role,works}])=>`
-      <div class="creator-group">
-        <div class="creator-name"><span>${roleIcon[role]||''}</span>${name}<span class="creator-name-count">${works.length}편</span></div>
-        ${works.map(w=>`<div class="creator-card"><div class="creator-card-top">
-          <div class="cat-badge ${catClass[w.cat]}">${catLabel[w.cat]}</div>
-          <div class="creator-card-title">${w.title}</div>
-          <span class="status-badge ${stClass[w.status]}">${stLabel[w.status]}</span>
-        </div>${w.review?`<div class="creator-card-review">${w.review}</div>`:''}</div>`).join('')}
+      <div class="creator-group"><div class="creator-name"><span>${roleIcon[role]||''}</span>${name}<span class="creator-name-count">${works.length}편</span></div>
+      ${works.map(w=>`<div class="creator-card"><div class="creator-card-top">
+        <div class="cat-badge ${catClass[w.cat]}">${catLabel[w.cat]}</div>
+        <div class="creator-card-title">${w.title}</div>
+        <span class="status-badge ${stClass[w.status]}">${stLabel[w.status]}</span>
+      </div>${w.review?`<div class="creator-card-review">${w.review}</div>`:''}</div>`).join('')}
       </div>`).join('');
     document.getElementById('creator-search-clear').style.display=q?'block':'none';
   }
@@ -507,12 +451,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     box.innerHTML=`<div class="cal-detail"><div class="cal-detail-date">${y}년 ${parseInt(m)}월 ${parseInt(d)}일</div>
       ${all.map(i=>`<div class="cal-detail-item">
         <div class="cat-badge ${catClass[i.cat]}">${catLabel[i.cat]}</div>
-        <div class="cal-detail-body">
-          <div class="cal-detail-title">${i.title}</div>
-          <div class="cal-detail-meta">${[getCreatorDisplay(i),stLabel[i.status]].filter(Boolean).join(' · ')}</div>
-          ${i.review?`<div class="cal-detail-review">${i.review}</div>`:''}
-        </div>
-        <button class="delete-btn" data-id="${i.id}"><i class="ti ti-trash"></i></button>
+        <div class="cal-detail-body"><div class="cal-detail-title">${i.title}</div>
+        <div class="cal-detail-meta">${[getCreatorDisplay(i),stLabel[i.status]].filter(Boolean).join(' · ')}</div>
+        ${i.review?`<div class="cal-detail-review">${i.review}</div>`:''}
+        </div><button class="delete-btn" data-id="${i.id}"><i class="ti ti-trash"></i></button>
       </div>`).join('')}</div>`;
   }
 
@@ -523,53 +465,38 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     document.getElementById(pickerId).innerHTML=genres.map(g=>`<button class="genre-pill ${selectedGenres.includes(g)?selCls:''}" data-genre="${g}">${g}</button>`).join('');
   }
 
-  async function callAI(prompt, resultBoxId, label) {
-    const box = document.getElementById(resultBoxId);
-    box.innerHTML = `<div class="ai-result"><div class="ai-result-label">${label}</div><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
-    try {
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      });
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(errText || res.status);
-      }
-      const text = await res.text();
-      if (!text || text.trim() === '') throw new Error('응답이 비어있어요');
-      const data = JSON.parse(text);
-      box.innerHTML = `<div class="ai-result"><div class="ai-result-label">${label}</div>${data.result}</div>`;
-    } catch (e) {
-      box.innerHTML = `<div class="ai-result" style="color:var(--color-text2);">오류: ${e.message}</div>`;
-    }
+  async function callAI(prompt,resultBoxId,label){
+    const box=document.getElementById(resultBoxId);
+    box.innerHTML=`<div class="ai-result"><div class="ai-result-label">${label}</div><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+    try{
+      const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+      if(!res.ok){const t=await res.text();throw new Error(t||res.status);}
+      const text=await res.text();
+      if(!text||text.trim()==='')throw new Error('응답이 비어있어요');
+      const data=JSON.parse(text);
+      box.innerHTML=`<div class="ai-result"><div class="ai-result-label">${label}</div>${data.result}</div>`;
+    }catch(e){box.innerHTML=`<div class="ai-result" style="color:var(--color-text2);">오류: ${e.message}</div>`;}
   }
 
   function handleAiBtn(type){
-    const lt=buildListText();
-    const ri=items.filter(i=>i.review&&i.review.trim());
-    if(type==='recommend') callAI(`내 독서/영화/드라마 목록이야:\n${lt}\n\n취향 분석해서 책 3개, 영화 또는 드라마 3개 추천해줘. 각 항목마다 제목, 장르, 추천 이유를 간결하게.`, 'ai-result-box', '✨ 취향 기반 추천');
-    else if(type==='report') callAI(`내 독서/영화/드라마 목록이야:\n${lt}\n\n취향 리포트를 써줘. 주제, 분위기, 인물 유형, 감정. 나라는 사람에 대한 통찰이 담긴 글로.`, 'ai-result-box', '📊 내 취향 리포트');
-    else if(type==='now'){
-      const r=[...items].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,4);
-      callAI(`최근 기록:\n${buildListText(r)}\n\n전체:\n${lt}\n\n요즘 내가 무엇을 찾고 있는지 조용하고 따뜻한 시선으로 읽어줘.`, 'ai-result-box', '💭 요즘 나는');
-    } else if(type==='pattern'){
-      if(!ri.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">아직 감상을 적은 항목이 없어요.</div>';return;}
-      callAI(`감상들:\n${ri.map(i=>`- ${i.title}: "${i.review}"`).join('\n')}\n\n패턴 분석해줘. 담담하고 문학적인 문체로.`, 'ai-result-box', '🔍 감상 패턴 분석');
-    }
+    const lt=buildListText();const ri=items.filter(i=>i.review&&i.review.trim());
+    if(type==='recommend')callAI(`내 독서/영화/드라마 목록이야:\n${lt}\n\n취향 분석해서 책 3개, 영화 또는 드라마 3개 추천해줘. 각 항목마다 제목, 장르, 추천 이유를 간결하게.`,'ai-result-box','✨ 취향 기반 추천');
+    else if(type==='report')callAI(`내 독서/영화/드라마 목록이야:\n${lt}\n\n취향 리포트를 써줘. 주제, 분위기, 인물 유형, 감정. 나라는 사람에 대한 통찰이 담긴 글로.`,'ai-result-box','📊 내 취향 리포트');
+    else if(type==='now'){const r=[...items].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,4);callAI(`최근 기록:\n${buildListText(r)}\n\n전체:\n${lt}\n\n요즘 내가 무엇을 찾고 있는지 조용하고 따뜻한 시선으로 읽어줘.`,'ai-result-box','💭 요즘 나는');}
+    else if(type==='pattern'){if(!ri.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">아직 감상을 적은 항목이 없어요.</div>';return;}callAI(`감상들:\n${ri.map(i=>`- ${i.title}: "${i.review}"`).join('\n')}\n\n패턴 분석해줘. 담담하고 문학적인 문체로.`,'ai-result-box','🔍 감상 패턴 분석');}
   }
 
   function handleContestBtn(type){
     const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
     const labels={all:'🏆 전국 문학 공모전',novel:'📖 소설 · 단편 공모전',essay:'✍️ 수필 · 에세이 공모전',poem:'🪶 시 · 시조 공모전',youth:'🏫 청소년 · 어린이 문학대회'};
     const prompts={
-      all:`오늘(${today}) 기준 현재 접수 중인 전국 문학 공모전을 정리해줘. 소설·수필·시 장르별로 구분해서 공모전 이름, 주최, 마감일, 시상 내역을 표 형식으로.`,
+      all:`오늘(${today}) 기준 현재 접수 중인 전국 문학 공모전을 정리해줘. 소설·수필·시 장르별로 구분해서 공모전 이름, 주최, 마감일, 시상 내역.`,
       novel:`오늘(${today}) 기준 현재 접수 중인 소설·단편 공모전을 정리해줘. 이름, 주최, 마감일, 분량, 시상 내역.`,
       essay:`오늘(${today}) 기준 현재 접수 중인 수필·에세이 공모전을 정리해줘. 이름, 주최, 마감일, 시상 내역.`,
       poem:`오늘(${today}) 기준 현재 접수 중인 시·시조 공모전을 정리해줘. 이름, 주최, 마감일, 시상 내역.`,
       youth:`오늘(${today}) 기준 현재 접수 중인 청소년·어린이 문학대회를 정리해줘. 이름, 주최, 마감일, 대상 연령, 시상 내역.`,
     };
-    callAI(prompts[type], 'contest-result', labels[type]);
+    callAI(prompts[type],'contest-result',labels[type]);
   }
 
   function switchTab(tab){
@@ -586,13 +513,26 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     document.getElementById('group-book').style.display=isBookCat(cat)?'':'none';
     document.getElementById('group-video').style.display=!isBookCat(cat)?'':'none';
     document.getElementById('field-date-end').style.display=isBookCat(cat)?'':'none';
-    selectedGenres=[];
     renderGenrePicker(cat);
   }
 
+  function openModal(){
+    editingId=null;
+    document.getElementById('modal-title').textContent='새 항목 추가';
+    ['inp-title','inp-review','inp-date-end','inp-author','inp-director','inp-actors'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('inp-cat').value='book';
+    document.getElementById('inp-status').value='want';
+    document.getElementById('inp-date').value=new Date().toISOString().split('T')[0];
+    selectedGenres=[];
+    updateModalFields();
+    document.getElementById('modal-bg').classList.add('open');
+    document.getElementById('inp-title').focus();
+  }
+
   function openEditModal(id){
-    const item=items.find(i=>i.id===id);
-    if(!item)return;
+    const item=items.find(i=>i.id===id);if(!item)return;
+    editingId=id;
+    document.getElementById('modal-title').textContent='항목 수정';
     document.getElementById('inp-title').value=item.title;
     document.getElementById('inp-cat').value=item.cat;
     document.getElementById('inp-status').value=item.status;
@@ -605,64 +545,37 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     selectedGenres=[...(item.genres||[])];
     updateModalFields();
     document.getElementById('modal-bg').classList.add('open');
-    document.getElementById('save-btn').dataset.editId=id;
-    document.getElementById('modal-title').textContent='항목 수정';
-  }
-  
-  function openModal(){
-    ['inp-title','inp-review','inp-date-end','inp-author','inp-director','inp-actors'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('inp-cat').value='book';
-    document.getElementById('inp-status').value='want';
-    document.getElementById('inp-date').value=new Date().toISOString().split('T')[0];
-    selectedGenres=[];
-    updateModalFields();
-    document.getElementById('modal-bg').classList.add('open');
     document.getElementById('inp-title').focus();
   }
-  function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 
- function addItem(){
-    const title=document.getElementById('inp-title').value.trim();
-    if(!title){document.getElementById('inp-title').focus();return;}
+  function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingId=null;}
+
+  function saveItem(){
+    const title=document.getElementById('inp-title').value.trim();if(!title){document.getElementById('inp-title').focus();return;}
     const cat=document.getElementById('inp-cat').value;
     const actors=document.getElementById('inp-actors').value.split(',').map(a=>a.trim()).filter(Boolean);
-    const editId=document.getElementById('save-btn').dataset.editId;
-    if(editId){
-      const idx=items.findIndex(i=>i.id===parseInt(editId));
-      if(idx>-1){
-        items[idx]={...items[idx],title,cat,
-          status:document.getElementById('inp-status').value,
-          author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
-          director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
-          actors:!isBookCat(cat)?actors:[],
-          genres:[...selectedGenres],
-          date:document.getElementById('inp-date').value,
-          dateEnd:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
-          review:document.getElementById('inp-review').value.trim()};
-      }
-      delete document.getElementById('save-btn').dataset.editId;
+    const data={title,cat,status:document.getElementById('inp-status').value,
+      author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
+      director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
+      actors:!isBookCat(cat)?actors:[],
+      genres:[...selectedGenres],
+      date:document.getElementById('inp-date').value,
+      dateEnd:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
+      review:document.getElementById('inp-review').value.trim()};
+    if(editingId){
+      const idx=items.findIndex(i=>i.id===editingId);
+      if(idx>-1)items[idx]={...items[idx],...data};
     } else {
-      items.unshift({id:nextId++,title,cat,
-        status:document.getElementById('inp-status').value,
-        author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
-        director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
-        actors:!isBookCat(cat)?actors:[],
-        genres:[...selectedGenres],
-        date:document.getElementById('inp-date').value,
-        dateEnd:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
-        review:document.getElementById('inp-review').value.trim()});
+      items.unshift({id:nextId++,...data});
     }
-    saveItems();
-    closeModal();render();
+    saveItems();closeModal();render();
     if(activeTab==='status')renderStatus();
     if(activeTab==='creator')renderCreator();
     if(activeTab==='diary')renderCalendar();
   }
-  
+
   function deleteItem(id){
-    items=items.filter(i=>i.id!==id);
-    saveItems();
-    render();
+    items=items.filter(i=>i.id!==id);saveItems();render();
     if(activeTab==='status')renderStatus();
     if(activeTab==='creator')renderCreator();
     if(activeTab==='diary')renderCalendar();
@@ -670,7 +583,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 
   document.getElementById('open-modal-btn').addEventListener('click',openModal);
   document.getElementById('cancel-btn').addEventListener('click',closeModal);
-  document.getElementById('save-btn').addEventListener('click',addItem);
+  document.getElementById('save-btn').addEventListener('click',saveItem);
   document.getElementById('modal-bg').addEventListener('click',function(e){if(e.target===this)closeModal();});
   document.getElementById('inp-cat').addEventListener('change',updateModalFields);
   document.getElementById('tab-row').addEventListener('click',function(e){const t=e.target.closest('.tab');if(t)switchTab(t.dataset.tab);});
@@ -687,10 +600,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   document.getElementById('cal-grid').addEventListener('click',function(e){const cell=e.target.closest('.cal-cell.clickable');if(!cell)return;const d=cell.dataset.date;selectedDate=selectedDate===d?null:d;renderCalDetail();});
   document.addEventListener('click',function(e){
     const b=e.target.closest('[data-id]');if(b)deleteItem(parseInt(b.dataset.id));
+    const ed=e.target.closest('[data-edit]');if(ed)openEditModal(parseInt(ed.dataset.edit));
     const a=e.target.closest('[data-aibtn]');if(a)handleAiBtn(a.dataset.aibtn);
     const cb=e.target.closest('[data-contestbtn]');if(cb)handleContestBtn(cb.dataset.contestbtn);
-    const eb=e.target.closest('[data-edit]');
-if(eb)openEditModal(parseInt(eb.dataset.edit));
   });
 
   render();
