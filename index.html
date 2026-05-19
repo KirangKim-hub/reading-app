@@ -264,6 +264,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 <div class="modal-bg" id="modal-bg">
   <div class="modal">
     <h2>새 항목 추가</h2>
+    <h2 id="modal-title">새 항목 추가</h2>
     <div class="field"><label>제목</label><input type="text" id="inp-title" placeholder="제목을 입력하세요" /></div>
     <div class="field"><label>카테고리</label>
       <select id="inp-cat"><option value="book">📖 책</option><option value="movie">🎬 영화</option><option value="drama">📺 드라마</option></select>
@@ -364,6 +365,28 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   }
 
   function cardHTML(item,hideStatus,q){
+    const creator=getCreatorDisplay(item);
+    const genres=item.genres||[];
+    const tagCls=isBookCat(item.cat)?'genre-tag-book':'genre-tag-video';
+    return`<div class="card"><div class="card-top">
+      <div class="cat-badge ${catClass[item.cat]}">${catLabel[item.cat]}</div>
+      <div class="card-body">
+        <div class="card-title">${q?highlight(item.title,q):item.title}</div>
+        <div class="card-sub">
+          ${creator?`<span>${creator}</span>`:''}
+          ${creator&&item.date?`<span>·</span>`:''}
+          ${item.date?`<span>${fmtDate(item.date)}${item.dateEnd?' ~ '+fmtDate(item.dateEnd):''}</span>`:''}
+        </div>
+        ${genres.length?`<div class="card-genres">${genres.map(g=>`<span class="genre-tag ${tagCls}">${g}</span>`).join('')}</div>`:''}
+      </div>
+      <div class="card-right">
+        ${!hideStatus?`<span class="status-badge ${stClass[item.status]}">${stLabel[item.status]}</span>`:''}
+        <button class="edit-btn" data-edit="${item.id}" aria-label="수정"><i class="ti ti-pencil"></i></button>
+        <button class="delete-btn" data-id="${item.id}" aria-label="삭제"><i class="ti ti-trash"></i></button>
+        .edit-btn { background: none; border: none; cursor: pointer; color: var(--color-text3); font-size: 16px; padding: 0; }
+      </div>
+    </div>${item.review?`<div class="card-review">${item.review}</div>`:''}</div>`;
+  }
     const creator=getCreatorDisplay(item);
     const genres=item.genres||[];
     const tagCls=isBookCat(item.cat)?'genre-tag-book':'genre-tag-video';
@@ -567,6 +590,25 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     renderGenrePicker(cat);
   }
 
+  function openEditModal(id){
+    const item=items.find(i=>i.id===id);
+    if(!item)return;
+    document.getElementById('inp-title').value=item.title;
+    document.getElementById('inp-cat').value=item.cat;
+    document.getElementById('inp-status').value=item.status;
+    document.getElementById('inp-date').value=item.date||'';
+    document.getElementById('inp-date-end').value=item.dateEnd||'';
+    document.getElementById('inp-author').value=item.author||'';
+    document.getElementById('inp-director').value=item.director||'';
+    document.getElementById('inp-actors').value=(item.actors||[]).join(', ');
+    document.getElementById('inp-review').value=item.review||'';
+    selectedGenres=[...(item.genres||[])];
+    updateModalFields();
+    document.getElementById('modal-bg').classList.add('open');
+    document.getElementById('save-btn').dataset.editId=id;
+    document.getElementById('modal-title').textContent='항목 수정';
+  }
+  
   function openModal(){
     ['inp-title','inp-review','inp-date-end','inp-author','inp-director','inp-actors'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('inp-cat').value='book';
@@ -579,25 +621,44 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   }
   function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 
-  function addItem(){
-    const title=document.getElementById('inp-title').value.trim();if(!title){document.getElementById('inp-title').focus();return;}
+ function addItem(){
+    const title=document.getElementById('inp-title').value.trim();
+    if(!title){document.getElementById('inp-title').focus();return;}
     const cat=document.getElementById('inp-cat').value;
     const actors=document.getElementById('inp-actors').value.split(',').map(a=>a.trim()).filter(Boolean);
-    items.unshift({id:nextId++,title,cat,status:document.getElementById('inp-status').value,
-      author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
-      director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
-      actors:!isBookCat(cat)?actors:[],
-      genres:[...selectedGenres],
-      date:document.getElementById('inp-date').value,
-      dateEnd:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
-      review:document.getElementById('inp-review').value.trim()});
+    const editId=document.getElementById('save-btn').dataset.editId;
+    if(editId){
+      const idx=items.findIndex(i=>i.id===parseInt(editId));
+      if(idx>-1){
+        items[idx]={...items[idx],title,cat,
+          status:document.getElementById('inp-status').value,
+          author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
+          director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
+          actors:!isBookCat(cat)?actors:[],
+          genres:[...selectedGenres],
+          date:document.getElementById('inp-date').value,
+          dateEnd:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
+          review:document.getElementById('inp-review').value.trim()};
+      }
+      delete document.getElementById('save-btn').dataset.editId;
+    } else {
+      items.unshift({id:nextId++,title,cat,
+        status:document.getElementById('inp-status').value,
+        author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
+        director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
+        actors:!isBookCat(cat)?actors:[],
+        genres:[...selectedGenres],
+        date:document.getElementById('inp-date').value,
+        dateEnd:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
+        review:document.getElementById('inp-review').value.trim()});
+    }
     saveItems();
     closeModal();render();
     if(activeTab==='status')renderStatus();
     if(activeTab==='creator')renderCreator();
     if(activeTab==='diary')renderCalendar();
   }
-
+  
   function deleteItem(id){
     items=items.filter(i=>i.id!==id);
     saveItems();
@@ -628,6 +689,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     const b=e.target.closest('[data-id]');if(b)deleteItem(parseInt(b.dataset.id));
     const a=e.target.closest('[data-aibtn]');if(a)handleAiBtn(a.dataset.aibtn);
     const cb=e.target.closest('[data-contestbtn]');if(cb)handleContestBtn(cb.dataset.contestbtn);
+    const eb=e.target.closest('[data-edit]');
+if(eb)openEditModal(parseInt(eb.dataset.edit));
   });
 
   render();
