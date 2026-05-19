@@ -245,6 +245,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
       <button class="ai-btn" data-aibtn="report"><i class="ti ti-user-search"></i> 내 취향 리포트 만들기</button>
       <button class="ai-btn" data-aibtn="now"><i class="ti ti-heartbeat"></i> 요즘 나는 뭘 찾고 있을까</button>
       <button class="ai-btn" data-aibtn="pattern"><i class="ti ti-writing"></i> 내 감상 속 패턴 분석</button>
+      <button class="ai-btn" data-aibtn="newbook"><i class="ti ti-bell"></i> 목록 작가 신간 검색</button>
     </div>
     <div id="ai-result-box"></div>
   </div>
@@ -484,6 +485,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     else if(type==='report')callAI(`내 독서/영화/드라마 목록이야:\n${lt}\n\n취향 리포트를 써줘. 주제, 분위기, 인물 유형, 감정. 나라는 사람에 대한 통찰이 담긴 글로.`,'ai-result-box','📊 내 취향 리포트');
     else if(type==='now'){const r=[...items].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,4);callAI(`최근 기록:\n${buildListText(r)}\n\n전체:\n${lt}\n\n요즘 내가 무엇을 찾고 있는지 조용하고 따뜻한 시선으로 읽어줘.`,'ai-result-box','💭 요즘 나는');}
     else if(type==='pattern'){if(!ri.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">아직 감상을 적은 항목이 없어요.</div>';return;}callAI(`감상들:\n${ri.map(i=>`- ${i.title}: "${i.review}"`).join('\n')}\n\n패턴 분석해줘. 담담하고 문학적인 문체로.`,'ai-result-box','🔍 감상 패턴 분석');}
+    else if(type==='newbook'){
+  const authors=items.filter(i=>i.cat==='book'&&i.author).map(i=>i.author);
+  const directors=items.filter(i=>i.cat!=='book'&&i.director).map(i=>i.director);
+  const names=[...new Set([...authors,...directors])];
+  if(!names.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">목록에 작가/감독 정보가 없어요.</div>';return;}
+  const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
+  callAI(`오늘(${today}) 기준으로 다음 작가/감독들의 최근 신간이나 신작 발표 소식을 알려줘:\n${names.map(n=>`- ${n}`).join('\n')}\n\n각 인물별로 최근 1~2년 내 신작이 있으면 제목, 출판/개봉 시기, 간단한 소개를 알려줘. 없으면 없다고 해줘.`,'ai-result-box','📚 목록 작가 · 감독 신작 소식');
+}
   }
 
   function handleContestBtn(type){
