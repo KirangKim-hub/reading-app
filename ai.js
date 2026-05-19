@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+javascriptexport default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -15,15 +15,21 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
 
-    const data = await response.json();
-    const text = (data.content || []).map(c => c.text || '').join('');
-    res.status(200).json({ result: text });
+    const text = await response.text();
+
+    if (!response.ok) {
+      return res.status(response.status).json({ error: text });
+    }
+
+    const data = JSON.parse(text);
+    const result = (data.content || []).map(c => c.text || '').join('');
+    res.status(200).json({ result });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
