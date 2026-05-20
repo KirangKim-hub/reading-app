@@ -643,7 +643,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   document.getElementById('open-modal-btn').addEventListener('click',openModal);
   document.getElementById('cancel-btn').addEventListener('click',closeModal);
   document.getElementById('save-btn').addEventListener('click',saveItem);
-  document.getElementById('modal-bg').addEventListener('click',function(e){if(e.target===this)closeModal();});
+  // 바깥 클릭으로 닫히지 않음
   document.getElementById('inp-cat').addEventListener('change',updateModalFields);
 
   document.getElementById('autofill-btn').addEventListener('click',async function(){
