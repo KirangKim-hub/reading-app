@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 300,
-          messages: [{ role: 'user', content: `"${title}"이라는 영화 또는 드라마에 대해 알고 있다면 다음 정보를 JSON으로만 답해줘. 모르면 빈 값으로. {"director":"감독명","actors":["배우1","배우2","배우3"],"genres":["장르1","장르2"]}` }],
+          messages: [{ role: 'user', content: `"${title}"이라는 영화 또는 드라마에 대해 알고 있다면 다음 정보를 JSON으로만 답해줘. 모르면 빈 값으로. {"director":"감독명","actors":["배우1","배우2","배우3"],"genres":["장르1","장르2"],"country":"제작나라","release_date":"YYYY-MM-DD"}` }],
         }),
       });
       const aiData = await response.json();
