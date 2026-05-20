@@ -328,7 +328,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   async function apiFetch(method,body){
     const res=await fetch('/api/items',{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
     if(!res.ok)throw new Error(await res.text());
-    return res.json();
+    const text=await res.text();
+    if(!text||text.trim()==='')return[];
+    return JSON.parse(text);
   }
 
   async function loadItems(){
