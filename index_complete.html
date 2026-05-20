@@ -44,8 +44,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 .chip.active { background: var(--color-bg2); color: var(--color-text); border-color: var(--color-border2); font-weight: 500; }
 .count-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
 .count-box { flex: 1; background: var(--color-bg2); border-radius: var(--radius-sm); padding: 10px 12px; }
-.count-label { font-size: 11px; color: var(--color-text2); margin-bottom: 2px; }
-.count-num { font-size: 20px; font-weight: 600; }
+.count-label { font-size: 11px; color: var(--color-text2); margin-bottom: 2px; pointer-events: none; }
+.count-num { font-size: 20px; font-weight: 600; pointer-events: none; }
 .card { background: var(--color-bg); border: 0.5px solid var(--color-border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
 .card-top { display: flex; gap: 10px; align-items: flex-start; }
 .cat-badge { flex-shrink: 0; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px; }
@@ -408,11 +408,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   }
 
   function renderStatus(){
-    document.getElementById('status-counts').innerHTML=`
-      <div class="count-box"><div class="count-label">${stIcon.want} 보고싶다</div><div class="count-num">${items.filter(i=>i.status==='want').length}</div></div>
-      <div class="count-box"><div class="count-label">${stIcon.reading} 보는중</div><div class="count-num">${items.filter(i=>i.status==='reading').length}</div></div>
-      <div class="count-box"><div class="count-label">${stIcon.done} 다봤다</div><div class="count-num">${items.filter(i=>i.status==='done').length}</div></div>`;
-    document.getElementById('status-list').innerHTML=stOrder.map(st=>{
+    const activeStatus=window._activeStatus||null;
+    document.getElementById('status-counts').innerHTML=stOrder.map(st=>`
+      <div class="count-box" data-status-filter="${st}" style="cursor:pointer;${activeStatus===st?'outline:2px solid var(--color-border2);':''}" >
+        <div class="count-label">${stIcon[st]} ${stLabel[st]}</div>
+        <div class="count-num">${items.filter(i=>i.status===st).length}</div>
+      </div>`).join('');
+    const filtered=activeStatus?stOrder.filter(s=>s===activeStatus):stOrder;
+    document.getElementById('status-list').innerHTML=filtered.map(st=>{
       const group=items.filter(i=>i.status===st);if(!group.length)return'';
       return`<div class="status-section"><div class="status-section-header"><span>${stIcon[st]}</span><span class="status-section-title">${stLabel[st]}</span><span class="status-section-count">${group.length}편</span></div>${group.map(i=>cardHTML(i,true,'')).join('')}</div>`;
     }).join('');
@@ -560,7 +563,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
     ['list','status','diary','creator','contest','ai'].forEach(v=>{document.getElementById('view-'+v).style.display=v===tab?'':'none';});
     if(tab==='creator')renderCreator();
-    if(tab==='status')renderStatus();
+    if(tab==='status'){window._activeStatus=null;renderStatus();}
     if(tab==='diary')renderCalendar();
   }
 
@@ -700,6 +703,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     const ed=e.target.closest('[data-edit]');if(ed)openEditModal(parseInt(ed.dataset.edit));
     const a=e.target.closest('[data-aibtn]');if(a)handleAiBtn(a.dataset.aibtn);
     const cb=e.target.closest('[data-contestbtn]');if(cb)handleContestBtn(cb.dataset.contestbtn);
+    const sf=e.target.closest('[data-status-filter]');
+    if(sf&&document.getElementById('view-status').style.display!=='none'){
+      const st=sf.dataset.statusFilter;
+      window._activeStatus=(window._activeStatus===st)?null:st;
+      renderStatus();
+    }
     const nb=e.target.closest('[data-newbook-add]');
     if(nb){
       const title=nb.dataset.title;
