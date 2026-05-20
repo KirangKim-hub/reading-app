@@ -529,10 +529,13 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
         const today=new Date();
         const oneYearAgo=new Date();oneYearAgo.setFullYear(today.getFullYear()-1);
         const fmt=(d)=>{if(!d||d.length<8)return d;return`${d.slice(0,4)}.${d.slice(4,6)}.${d.slice(6,8)}`;};
-        const rows=books.map(b=>`<div style="padding:10px 0;border-bottom:0.5px solid var(--color-border);">
-          <div style="font-size:13px;font-weight:500;">${b.title}</div>
-          <div style="font-size:12px;color:var(--color-text2);margin-top:3px;">${b.author} · ${b.publisher} · ${fmt(b.pubdate)}</div>
-          ${b.description?`<div style="font-size:12px;color:var(--color-text2);margin-top:4px;line-height:1.5;">${b.description}</div>`:''}
+        const rows=books.map((b,idx)=>`<div style="padding:10px 0;border-bottom:0.5px solid var(--color-border);display:flex;align-items:flex-start;gap:10px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:500;">${b.title}</div>
+            <div style="font-size:12px;color:var(--color-text2);margin-top:3px;">${b.author} · ${b.publisher} · ${fmt(b.pubdate)}</div>
+            ${b.description?`<div style="font-size:12px;color:var(--color-text2);margin-top:4px;line-height:1.5;">${b.description}</div>`:''}
+          </div>
+          <button data-newbook-add="${idx}" data-title="${(b.title||'').replace(/"/g,'&quot;')}" data-author="${(b.author||'').replace(/"/g,'&quot;')}" data-publisher="${(b.publisher||'').replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:4px 10px;font-size:11px;border-radius:999px;background:var(--color-bg2);border:0.5px solid var(--color-border);cursor:pointer;white-space:nowrap;">+ 추가</button>
         </div>`).join('');
         box.innerHTML=`<div class="ai-result"><div class="ai-result-label">📚 목록 작가 신간 (최신순)</div>${rows}</div>`;
       }catch(e){box.innerHTML=`<div class="ai-result" style="color:var(--color-text2);">오류: ${e.message}</div>`;}
@@ -697,6 +700,23 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     const ed=e.target.closest('[data-edit]');if(ed)openEditModal(parseInt(ed.dataset.edit));
     const a=e.target.closest('[data-aibtn]');if(a)handleAiBtn(a.dataset.aibtn);
     const cb=e.target.closest('[data-contestbtn]');if(cb)handleContestBtn(cb.dataset.contestbtn);
+    const nb=e.target.closest('[data-newbook-add]');
+    if(nb){
+      const title=nb.dataset.title;
+      const author=nb.dataset.author;
+      const publisher=nb.dataset.publisher;
+      nb.textContent='✓ 추가됨';
+      nb.disabled=true;
+      nb.style.color='var(--color-text2)';
+      const data={
+        title,cat:'book',status:'want',
+        author,publisher,director:'',actors:[],genres:[],
+        date:new Date().toISOString().split('T')[0],date_end:'',review:''
+      };
+      fetch('/api/items',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+        .then(r=>r.json()).then(d=>{items.unshift(normalizeItem(d));render();})
+        .catch(e=>{nb.textContent='+ 추가';nb.disabled=false;});
+    }
   });
 
   loadItems();
