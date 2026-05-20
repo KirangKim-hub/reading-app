@@ -18,7 +18,8 @@ module.exports = async function handler(req, res) {
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      res.status(200).json(data);
+      res.setHeader('Content-Type', 'application/json');
+res.status(200).json(data);
 
     } else if (req.method === 'POST') {
       const { data, error } = await supabase
