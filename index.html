@@ -326,7 +326,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   function setSyncStatus(msg){document.getElementById('sync-status').textContent=msg;}
 
   async function apiFetch(method,body){
-    const res=await fetch('/api/items',{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+    const options={method,headers:{'Content-Type':'application/json'}};
+    if(body&&method!=='GET')options.body=JSON.stringify(body);
+    const res=await fetch('/api/items',options);
     if(!res.ok)throw new Error(await res.text());
     return res.json();
   }
