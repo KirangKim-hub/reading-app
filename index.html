@@ -281,6 +281,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     <div class="field-group" id="group-book">
       <div class="field-group-label">📖 책 정보</div>
       <div class="field"><label>작가</label><input type="text" id="inp-author" placeholder="예: 한강" /></div>
+      <div class="field"><label>출판사</label><input type="text" id="inp-publisher" placeholder="예: 문학동네" /></div>
       <div class="field" style="margin-bottom:0;"><label>장르</label><div class="genre-picker" id="genre-picker-book"></div></div>
     </div>
     <div class="field-group" id="group-video" style="display:none;">
@@ -347,7 +348,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   function normalizeItem(d){
     return{
       id:d.id,title:d.title||'',cat:d.cat||'book',status:d.status||'want',
-      author:d.author||'',director:d.director||'',
+      author:d.author||'',publisher:d.publisher||'',director:d.director||'',
       actors:Array.isArray(d.actors)?d.actors:(d.actors?JSON.parse(d.actors):[]),
       genres:Array.isArray(d.genres)?d.genres:(d.genres?JSON.parse(d.genres):[]),
       date:d.date||'',dateEnd:d.date_end||d.dateEnd||'',review:d.review||'',
@@ -356,7 +357,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 
   function fmtDate(d){if(!d)return'';const[y,m,day]=d.split('-');return`${y}.${m}.${day}`;}
   function dateStr(y,m,d){return`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
-  function getCreatorDisplay(i){return[i.author,i.director,...(i.actors||[])].filter(Boolean).join(', ');}
+  function getCreatorDisplay(i){return[i.author,i.publisher,i.director,...(i.actors||[])].filter(Boolean).join(', ');}
   function highlight(text,q){if(!q)return text;const idx=text.toLowerCase().indexOf(q.toLowerCase());if(idx<0)return text;return text.slice(0,idx)+`<mark>${text.slice(idx,idx+q.length)}</mark>`+text.slice(idx+q.length);}
   function isBookCat(cat){return cat==='book';}
   function getBookColor(id){const books=items.filter(i=>i.cat==='book'&&(i.date||i.dateEnd));const idx=books.findIndex(i=>i.id===id);return BOOK_COLORS[idx%BOOK_COLORS.length];}
@@ -558,7 +559,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   function openModal(){
     editingId=null;
     document.getElementById('modal-title').textContent='새 항목 추가';
-    ['inp-title','inp-review','inp-date-end','inp-author','inp-director','inp-actors'].forEach(id=>document.getElementById(id).value='');
+    ['inp-title','inp-review','inp-date-end','inp-author','inp-publisher','inp-director','inp-actors'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('inp-cat').value='book';
     document.getElementById('inp-status').value='want';
     document.getElementById('inp-date').value=new Date().toISOString().split('T')[0];
@@ -578,6 +579,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     document.getElementById('inp-date').value=item.date||'';
     document.getElementById('inp-date-end').value=item.dateEnd||'';
     document.getElementById('inp-author').value=item.author||'';
+    document.getElementById('inp-publisher').value=item.publisher||'';
     document.getElementById('inp-director').value=item.director||'';
     document.getElementById('inp-actors').value=(item.actors||[]).join(', ');
     document.getElementById('inp-review').value=item.review||'';
@@ -596,6 +598,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     const data={
       title,cat,status:document.getElementById('inp-status').value,
       author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
+      publisher:isBookCat(cat)?document.getElementById('inp-publisher').value.trim():'',
       director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
       actors:!isBookCat(cat)?actors:[],
       genres:[...selectedGenres],
@@ -651,6 +654,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
       const data=await res.json();
       if(isBookCat(cat)){
         if(data.author)document.getElementById('inp-author').value=data.author;
+        if(data.publisher)document.getElementById('inp-publisher').value=data.publisher;
         if(data.genres&&data.genres.length){selectedGenres=data.genres;renderGenrePicker(cat);}
       }else{
         if(data.director)document.getElementById('inp-director').value=data.director;
