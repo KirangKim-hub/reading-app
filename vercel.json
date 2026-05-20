@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "ai.js", "use": "@vercel/node" },
-    { "src": "api/items.js", "use": "@vercel/node" },
-    { "src": "api/search.js", "use": "@vercel/node" },
-    { "src": "index.html", "use": "@vercel/static" }
-  ],
+  "functions": {
+    "ai.js": { "runtime": "@vercel/node" },
+    "api/items.js": { "runtime": "@vercel/node" },
+    "api/search.js": { "runtime": "@vercel/node" }
+  },
   "routes": [
     { "src": "/api/ai", "dest": "/ai.js" },
     { "src": "/api/items", "dest": "/api/items.js" },
