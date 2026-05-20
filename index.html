@@ -517,12 +517,25 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     else if(type==='now'){const r=[...items].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,4);callAI(`최근 기록:\n${buildListText(r)}\n\n전체:\n${lt}\n\n요즘 내가 무엇을 찾고 있는지 조용하고 따뜻한 시선으로 읽어줘.`,'ai-result-box','💭 요즘 나는');}
     else if(type==='pattern'){if(!ri.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">아직 감상을 적은 항목이 없어요.</div>';return;}callAI(`감상들:\n${ri.map(i=>`- ${i.title}: "${i.review}"`).join('\n')}\n\n패턴 분석해줘. 담담하고 문학적인 문체로.`,'ai-result-box','🔍 감상 패턴 분석');}
     else if(type==='newbook'){
-      const authors=items.filter(i=>i.cat==='book'&&i.author).map(i=>i.author);
-      const directors=items.filter(i=>i.cat!=='book'&&i.director).map(i=>i.director);
-      const names=[...new Set([...authors,...directors])];
-      if(!names.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">목록에 작가/감독 정보가 없어요.</div>';return;}
-      const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
-      callAI(`오늘(${today}) 기준으로 다음 작가/감독들의 최근 신간이나 신작 발표 소식을 알려줘:\n${names.map(n=>`- ${n}`).join('\n')}\n\n각 인물별로 최근 1~2년 내 신작이 있으면 제목, 출판/개봉 시기, 간단한 소개를 알려줘.`,'ai-result-box','📚 목록 작가 · 감독 신작 소식');
+      const authors=[...new Set(items.filter(i=>i.cat==='book'&&i.author).map(i=>i.author))];
+      if(!authors.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">목록에 작가 정보가 없어요.</div>';return;}
+      const box=document.getElementById('ai-result-box');
+      box.innerHTML=`<div class="ai-result"><div class="ai-result-label">📚 목록 작가 신간 검색</div><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+      try{
+        const res=await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'newbooks',authors})});
+        const data=await res.json();
+        const books=data.books||[];
+        if(!books.length){box.innerHTML='<div class="ai-result">최근 신간 정보를 찾지 못했어요.</div>';return;}
+        const today=new Date();
+        const oneYearAgo=new Date();oneYearAgo.setFullYear(today.getFullYear()-1);
+        const fmt=(d)=>{if(!d||d.length<8)return d;return`${d.slice(0,4)}.${d.slice(4,6)}.${d.slice(6,8)}`;};
+        const rows=books.map(b=>`<div style="padding:10px 0;border-bottom:0.5px solid var(--color-border);">
+          <div style="font-size:13px;font-weight:500;">${b.title}</div>
+          <div style="font-size:12px;color:var(--color-text2);margin-top:3px;">${b.author} · ${b.publisher} · ${fmt(b.pubdate)}</div>
+          ${b.description?`<div style="font-size:12px;color:var(--color-text2);margin-top:4px;line-height:1.5;">${b.description}</div>`:''}
+        </div>`).join('');
+        box.innerHTML=`<div class="ai-result"><div class="ai-result-label">📚 목록 작가 신간 (최신순)</div>${rows}</div>`;
+      }catch(e){box.innerHTML=`<div class="ai-result" style="color:var(--color-text2);">오류: ${e.message}</div>`;}
     }
   }
 
@@ -675,19 +688,4 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   document.getElementById('creator-search-clear').addEventListener('click',function(){creatorQ='';document.getElementById('creator-search').value='';this.style.display='none';renderCreator();});
   document.getElementById('creator-tabs').addEventListener('click',function(e){const t=e.target.closest('.creator-tab');if(!t)return;creatorTab=t.dataset.ctab;document.querySelectorAll('.creator-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');renderCreator();});
   document.getElementById('genre-picker-book').addEventListener('click',function(e){const btn=e.target.closest('.genre-pill');if(!btn)return;const g=btn.dataset.genre;selectedGenres=selectedGenres.includes(g)?selectedGenres.filter(x=>x!==g):[...selectedGenres,g];renderGenrePicker('book');});
-  document.getElementById('genre-picker-video').addEventListener('click',function(e){const btn=e.target.closest('.genre-pill');if(!btn)return;const g=btn.dataset.genre;selectedGenres=selectedGenres.includes(g)?selectedGenres.filter(x=>x!==g):[...selectedGenres,g];renderGenrePicker(document.getElementById('inp-cat').value);});
-  document.getElementById('cal-prev').addEventListener('click',function(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}selectedDate=null;renderCalendar();});
-  document.getElementById('cal-next').addEventListener('click',function(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}selectedDate=null;renderCalendar();});
-  document.getElementById('cal-grid').addEventListener('click',function(e){const cell=e.target.closest('.cal-cell.clickable');if(!cell)return;const d=cell.dataset.date;selectedDate=selectedDate===d?null:d;renderCalDetail();});
-  document.addEventListener('click',function(e){
-    const b=e.target.closest('[data-id]');if(b)deleteItem(parseInt(b.dataset.id));
-    const ed=e.target.closest('[data-edit]');if(ed)openEditModal(parseInt(ed.dataset.edit));
-    const a=e.target.closest('[data-aibtn]');if(a)handleAiBtn(a.dataset.aibtn);
-    const cb=e.target.closest('[data-contestbtn]');if(cb)handleContestBtn(cb.dataset.contestbtn);
-  });
-
-  loadItems();
-})();
-</script>
-</body>
-</html>
+  document.getElementById('genre-picker-video').addEventListener('click',function(e){const btn=e.target.closest('.genre-pill');if(!btn)return;const g=btn.dataset.genre;selectedGenres=selectedGenres.includes(g)?selectedGenres.filter(x=>x!==g):[...selectedGenres,g];rend
