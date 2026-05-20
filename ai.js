@@ -10,29 +10,32 @@ module.exports = async function handler(req, res) {
   if (!prompt) return res.status(400).json({ error: 'prompt required' });
 
   try {
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+    };
+
     const body = {
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }],
     };
 
     if (useWebSearch) {
+      headers['anthropic-beta'] = 'web-search-2025-03-05';
+      body.model = 'claude-sonnet-4-5-20251001';
       body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
     }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'web-search-2025-03-05',
-      },
+      headers,
       body: JSON.stringify(body),
     });
 
     const text = await response.text();
-    if (!response.ok) return res.status(response.status).json({ error: text });
+    if (!response.ok) return res.status(200).json({ result: '오류: ' + text });
 
     const data = JSON.parse(text);
     const result = (data.content || [])
@@ -40,7 +43,4 @@ module.exports = async function handler(req, res) {
       .map(c => c.text || '')
       .join('');
     res.status(200).json({ result });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+  } ca
