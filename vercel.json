@@ -4,6 +4,7 @@
     { "src": "ai.js", "use": "@vercel/node" },
     { "src": "api/items.js", "use": "@vercel/node" },
     { "src": "api/search.js", "use": "@vercel/node" },
+    
     { "src": "app.html", "use": "@vercel/static" }
   ],
   "routes": [
