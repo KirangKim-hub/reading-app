@@ -510,11 +510,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     document.getElementById(pickerId).innerHTML=genres.map(g=>\`<button class="genre-pill \${selectedGenres.includes(g)?selCls:''}" data-genre="\${g}">\${g}</button>\`).join('');
   }
 
-  async function callAI(prompt,resultBoxId,label){
+  async function callAI(prompt,resultBoxId,label,useWebSearch=false){
     const box=document.getElementById(resultBoxId);
     box.innerHTML=\`<div class="ai-result"><div class="ai-result-label">\${label}</div><div class="loading-dots"><span></span><span></span><span></span></div></div>\`;
     try{
-      const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+      const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,useWebSearch})});
       if(!res.ok)throw new Error(await res.text());
       const text=await res.text();
       if(!text||text.trim()==='')throw new Error('응답이 비어있어요');
@@ -565,7 +565,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
       poem:\`오늘(\${today}) 기준 현재 접수 중인 시·시조 공모전을 정리해줘.\`,
       youth:\`오늘(\${today}) 기준 현재 접수 중인 청소년·어린이 문학대회를 정리해줘.\`,
     };
-    callAI(prompts[type],'contest-result',labels[type]);
+    callAI(prompts[type],'contest-result',labels[type],true);
   }
 
   function switchTab(tab){
