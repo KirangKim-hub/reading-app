@@ -83,8 +83,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
 .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes dot { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
-.loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.15); z-index: 200; display: flex; align-items: center; justify-content: center; }
-.loading-box { background: var(--color-bg); border-radius: var(--radius); padding: 20px 28px; display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--color-text2); box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
 .creator-tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
 .creator-tab { flex: 1; padding: 7px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; border: 0.5px solid var(--color-border); background: var(--color-bg); color: var(--color-text2); cursor: pointer; text-align: center; }
 .creator-tab.active { background: var(--color-bg2); color: var(--color-text); border-color: var(--color-border2); }
@@ -151,6 +149,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 .field-hint { font-size: 11px; color: var(--color-text3); margin-top: 4px; }
 .field-group { background: var(--color-bg2); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 12px; }
 .field-group-label { font-size: 11px; font-weight: 500; color: var(--color-text2); margin-bottom: 8px; }
+.title-row { display: flex; gap: 8px; }
+.title-row input { flex: 1; }
+.autofill-btn { flex-shrink: 0; padding: 8px 12px; font-size: 12px; cursor: pointer; white-space: nowrap; }
 .modal-actions { display: flex; gap: 8px; margin-top: 1rem; }
 .modal-actions button { flex: 1; padding: 11px; border-radius: var(--radius-sm); font-size: 15px; cursor: pointer; font-weight: 500; }
 .btn-cancel { background: var(--color-bg2); border: 0.5px solid var(--color-border); color: var(--color-text2); }
@@ -257,7 +258,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 <div class="modal-bg" id="modal-bg">
   <div class="modal">
     <h2 id="modal-title">새 항목 추가</h2>
-    <div class="field"><label>제목</label><input type="text" id="inp-title" placeholder="제목을 입력하세요" /></div>
+    <div class="field">
+      <label>제목</label>
+      <div class="title-row">
+        <input type="text" id="inp-title" placeholder="제목을 입력하세요" />
+        <button type="button" class="autofill-btn" id="autofill-btn">🔍 자동완성</button>
+      </div>
+      <div class="field-hint">제목 입력 후 🔍 버튼으로 작가·장르를 자동으로 채울 수 있어요</div>
+    </div>
     <div class="field"><label>카테고리</label>
       <select id="inp-cat"><option value="book">📖 책</option><option value="movie">🎬 영화</option><option value="drama">📺 드라마</option></select>
     </div>
@@ -330,26 +338,19 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
       setSyncStatus('✓ 동기화 완료');
       render();
     }catch(e){
-      setSyncStatus('⚠ 서버 연결 실패 — 로컬 데이터 사용 중');
-      const local=localStorage.getItem('my-list-items-v1');
-      items=local?JSON.parse(local).map(normalizeItem):[];
+      setSyncStatus('⚠ 서버 연결 실패');
+      items=[];
       render();
     }
   }
 
   function normalizeItem(d){
     return{
-      id:d.id,
-      title:d.title||'',
-      cat:d.cat||'book',
-      status:d.status||'want',
-      author:d.author||'',
-      director:d.director||'',
+      id:d.id,title:d.title||'',cat:d.cat||'book',status:d.status||'want',
+      author:d.author||'',director:d.director||'',
       actors:Array.isArray(d.actors)?d.actors:(d.actors?JSON.parse(d.actors):[]),
       genres:Array.isArray(d.genres)?d.genres:(d.genres?JSON.parse(d.genres):[]),
-      date:d.date||'',
-      dateEnd:d.date_end||d.dateEnd||'',
-      review:d.review||'',
+      date:d.date||'',dateEnd:d.date_end||d.dateEnd||'',review:d.review||'',
     };
   }
 
@@ -593,8 +594,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     const cat=document.getElementById('inp-cat').value;
     const actors=document.getElementById('inp-actors').value.split(',').map(a=>a.trim()).filter(Boolean);
     const data={
-      title,cat,
-      status:document.getElementById('inp-status').value,
+      title,cat,status:document.getElementById('inp-status').value,
       author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
       director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
       actors:!isBookCat(cat)?actors:[],
@@ -616,9 +616,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
         items.unshift(normalizeItem(created));
       }
       setSyncStatus('✓ 저장 완료');
-    }catch(e){
-      setSyncStatus('⚠ 저장 실패: '+e.message);
-    }
+    }catch(e){setSyncStatus('⚠ 저장 실패: '+e.message);}
     render();
     if(activeTab==='status')renderStatus();
     if(activeTab==='creator')renderCreator();
@@ -634,9 +632,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
       setSyncStatus('삭제 중...');
       await apiFetch('DELETE',{id});
       setSyncStatus('✓ 삭제 완료');
-    }catch(e){
-      setSyncStatus('⚠ 삭제 실패: '+e.message);
-    }
+    }catch(e){setSyncStatus('⚠ 삭제 실패: '+e.message);}
   }
 
   document.getElementById('open-modal-btn').addEventListener('click',openModal);
@@ -644,6 +640,27 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   document.getElementById('save-btn').addEventListener('click',saveItem);
   document.getElementById('modal-bg').addEventListener('click',function(e){if(e.target===this)closeModal();});
   document.getElementById('inp-cat').addEventListener('change',updateModalFields);
+
+  document.getElementById('autofill-btn').addEventListener('click',async function(){
+    const title=document.getElementById('inp-title').value.trim();
+    const cat=document.getElementById('inp-cat').value;
+    if(!title){document.getElementById('inp-title').focus();return;}
+    this.textContent='검색 중...';this.disabled=true;
+    try{
+      const res=await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,cat})});
+      const data=await res.json();
+      if(isBookCat(cat)){
+        if(data.author)document.getElementById('inp-author').value=data.author;
+        if(data.genres&&data.genres.length){selectedGenres=data.genres;renderGenrePicker(cat);}
+      }else{
+        if(data.director)document.getElementById('inp-director').value=data.director;
+        if(data.actors&&data.actors.length)document.getElementById('inp-actors').value=data.actors.join(', ');
+        if(data.genres&&data.genres.length){selectedGenres=data.genres;renderGenrePicker(cat);}
+      }
+    }catch(e){alert('자동완성 실패: '+e.message);}
+    this.textContent='🔍 자동완성';this.disabled=false;
+  });
+
   document.getElementById('tab-row').addEventListener('click',function(e){const t=e.target.closest('.tab');if(t)switchTab(t.dataset.tab);});
   document.getElementById('filter-row').addEventListener('click',function(e){const c=e.target.closest('.chip');if(!c)return;filter=c.dataset.filter;document.querySelectorAll('#filter-row .chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');render();});
   document.getElementById('list-search').addEventListener('input',function(){listQ=this.value;render();});
