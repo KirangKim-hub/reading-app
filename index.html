@@ -510,7 +510,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     }catch(e){box.innerHTML=`<div class="ai-result" style="color:var(--color-text2);">오류: ${e.message}</div>`;}
   }
 
-  function handleAiBtn(type){
+  async function handleAiBtn(type){
     const lt=buildListText();const ri=items.filter(i=>i.review&&i.review.trim());
     if(type==='recommend')callAI(`내 독서/영화/드라마 목록이야:\n${lt}\n\n취향 분석해서 책 3개, 영화 또는 드라마 3개 추천해줘. 각 항목마다 제목, 장르, 추천 이유를 간결하게.`,'ai-result-box','✨ 취향 기반 추천');
     else if(type==='report')callAI(`내 독서/영화/드라마 목록이야:\n${lt}\n\n취향 리포트를 써줘. 주제, 분위기, 인물 유형, 감정. 나라는 사람에 대한 통찰이 담긴 글로.`,'ai-result-box','📊 내 취향 리포트');
