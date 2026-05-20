@@ -326,9 +326,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   function setSyncStatus(msg){document.getElementById('sync-status').textContent=msg;}
 
   async function apiFetch(method,body){
-    const options={method,headers:{'Content-Type':'application/json'}};
-    if(body&&method!=='GET')options.body=JSON.stringify(body);
-    const res=await fetch('/api/items',options);
+    const res=await fetch('/api/items',{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
     if(!res.ok)throw new Error(await res.text());
     return res.json();
   }
@@ -690,4 +688,19 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   document.getElementById('creator-search-clear').addEventListener('click',function(){creatorQ='';document.getElementById('creator-search').value='';this.style.display='none';renderCreator();});
   document.getElementById('creator-tabs').addEventListener('click',function(e){const t=e.target.closest('.creator-tab');if(!t)return;creatorTab=t.dataset.ctab;document.querySelectorAll('.creator-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');renderCreator();});
   document.getElementById('genre-picker-book').addEventListener('click',function(e){const btn=e.target.closest('.genre-pill');if(!btn)return;const g=btn.dataset.genre;selectedGenres=selectedGenres.includes(g)?selectedGenres.filter(x=>x!==g):[...selectedGenres,g];renderGenrePicker('book');});
-  document.getElementById('genre-picker-video').addEventListener('click',function(e){const btn=e.target.closest('.genre-pill');if(!btn)return;const g=btn.dataset.genre;selectedGenres=selectedGenres.includes(g)?selectedGenres.filter(x=>x!==g):[...selectedGenres,g];rend
+  document.getElementById('genre-picker-video').addEventListener('click',function(e){const btn=e.target.closest('.genre-pill');if(!btn)return;const g=btn.dataset.genre;selectedGenres=selectedGenres.includes(g)?selectedGenres.filter(x=>x!==g):[...selectedGenres,g];renderGenrePicker(document.getElementById('inp-cat').value);});
+  document.getElementById('cal-prev').addEventListener('click',function(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}selectedDate=null;renderCalendar();});
+  document.getElementById('cal-next').addEventListener('click',function(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}selectedDate=null;renderCalendar();});
+  document.getElementById('cal-grid').addEventListener('click',function(e){const cell=e.target.closest('.cal-cell.clickable');if(!cell)return;const d=cell.dataset.date;selectedDate=selectedDate===d?null:d;renderCalDetail();});
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('[data-id]');if(b)deleteItem(parseInt(b.dataset.id));
+    const ed=e.target.closest('[data-edit]');if(ed)openEditModal(parseInt(ed.dataset.edit));
+    const a=e.target.closest('[data-aibtn]');if(a)handleAiBtn(a.dataset.aibtn);
+    const cb=e.target.closest('[data-contestbtn]');if(cb)handleContestBtn(cb.dataset.contestbtn);
+  });
+
+  loadItems();
+})();
+</script>
+</body>
+</html>
