@@ -589,7 +589,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     document.getElementById('inp-title').focus();
   }
 
-  function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingId=null;}
+  function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 
   async function saveItem(){
     const title=document.getElementById('inp-title').value.trim();if(!title){document.getElementById('inp-title').focus();return;}
@@ -606,46 +606,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
       date_end:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
       review:document.getElementById('inp-review').value.trim(),
     };
-    const currentEditingId=editingId;
+    const savedEditingId=editingId;
     closeModal();
+    editingId=null;
     try{
-      if(currentEditingId){
+      if(savedEditingId){
         setSyncStatus('저장 중...');
-        const updated=await apiFetch('PUT',{id:currentEditingId,...data});
-        const idx=items.findIndex(i=>i.id===currentEditingId);
-        if(idx>-1)items[idx]=normalizeItem(updated);
-      }else{
-        setSyncStatus('저장 중...');
-        const created=await apiFetch('POST',data);
-        items.unshift(normalizeItem(created));
-      }
-      setSyncStatus('✓ 저장 완료');
-    }catch(e){setSyncStatus('⚠ 저장 실패: '+e.message);}
-    render();
-    if(activeTab==='status')renderStatus();
-    if(activeTab==='creator')renderCreator();
-    if(activeTab==='diary')renderCalendar();
-  }
-    const title=document.getElementById('inp-title').value.trim();if(!title){document.getElementById('inp-title').focus();return;}
-    const cat=document.getElementById('inp-cat').value;
-    const actors=document.getElementById('inp-actors').value.split(',').map(a=>a.trim()).filter(Boolean);
-    const data={
-      title,cat,status:document.getElementById('inp-status').value,
-      author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
-      publisher:isBookCat(cat)?document.getElementById('inp-publisher').value.trim():'',
-      director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
-      actors:!isBookCat(cat)?actors:[],
-      genres:[...selectedGenres],
-      date:document.getElementById('inp-date').value,
-      date_end:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
-      review:document.getElementById('inp-review').value.trim(),
-    };
-    closeModal();
-    try{
-      if(editingId){
-        setSyncStatus('저장 중...');
-        const updated=await apiFetch('PUT',{id:editingId,...data});
-        const idx=items.findIndex(i=>i.id===editingId);
+        const updated=await apiFetch('PUT',{id:savedEditingId,...data});
+        const idx=items.findIndex(i=>i.id===savedEditingId);
         if(idx>-1)items[idx]=normalizeItem(updated);
       }else{
         setSyncStatus('저장 중...');
