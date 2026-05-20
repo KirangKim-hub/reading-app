@@ -67,7 +67,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 .st-want { background: #F1EFE8; color: #5F5E5A; }
 .card-actions { display: flex; gap: 8px; }
 .edit-btn, .delete-btn { background: none; border: none; cursor: pointer; color: var(--color-text3); font-size: 16px; padding: 0; }
-.edit-btn:active, .delete-btn:active { opacity: 0.5; }
 .card-review { margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--color-border); font-size: 13px; color: var(--color-text2); line-height: 1.7; white-space: pre-wrap; }
 .empty { text-align: center; padding: 3rem 1rem; color: var(--color-text2); font-size: 14px; line-height: 1.7; }
 .search-result-count { font-size: 12px; color: var(--color-text2); margin-bottom: 10px; }
@@ -84,6 +83,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
 .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes dot { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+.loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.15); z-index: 200; display: flex; align-items: center; justify-content: center; }
+.loading-box { background: var(--color-bg); border-radius: var(--radius); padding: 20px 28px; display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--color-text2); box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
 .creator-tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
 .creator-tab { flex: 1; padding: 7px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; border: 0.5px solid var(--color-border); background: var(--color-bg); color: var(--color-text2); cursor: pointer; text-align: center; }
 .creator-tab.active { background: var(--color-bg2); color: var(--color-text); border-color: var(--color-border2); }
@@ -154,6 +155,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 .modal-actions button { flex: 1; padding: 11px; border-radius: var(--radius-sm); font-size: 15px; cursor: pointer; font-weight: 500; }
 .btn-cancel { background: var(--color-bg2); border: 0.5px solid var(--color-border); color: var(--color-text2); }
 .btn-save { background: var(--color-text); border: none; color: var(--color-bg); }
+.sync-status { font-size: 11px; color: var(--color-text3); text-align: center; padding: 4px 0 8px; }
 </style>
 </head>
 <body>
@@ -162,6 +164,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     <h1>내 목록</h1>
     <button class="add-btn" id="open-modal-btn"><i class="ti ti-plus"></i></button>
   </div>
+  <div class="sync-status" id="sync-status">동기화 중...</div>
   <div class="tab-row" id="tab-row">
     <button class="tab active" data-tab="list">전체 목록</button>
     <button class="tab" data-tab="status">상태별</button>
@@ -296,21 +299,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   const BOOK_COLORS=['#378ADD','#1D9E75','#7F77DD','#D85A30','#BA7517','#993556'];
   const BOOK_GENRES=['소설','수필','시','자기계발','인문','역사','과학','철학','경제경영','사회','여행','아동','만화','기타'];
   const VIDEO_GENRES=['드라마','로맨스','코미디','스릴러','공포','액션','SF','판타지','미스터리','다큐','애니','범죄','역사','전쟁','가족'];
-  const STORAGE_KEY='my-list-items-v1';
 
-  function loadItems(){try{const r=localStorage.getItem(STORAGE_KEY);return r?JSON.parse(r):getDefault();}catch{return getDefault();}}
-  function saveItems(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(items));}catch{}}
-  function getDefault(){return[
-    {id:1,title:'파친코',cat:'book',status:'done',author:'이민진',director:'',actors:[],genres:['소설'],date:'2024-03-01',dateEnd:'2024-03-10',review:'세대를 가로지르는 이야기인데, 읽는 내내 숨이 막혔다.'},
-    {id:2,title:'채식주의자',cat:'book',status:'done',author:'한강',director:'',actors:[],genres:['소설'],date:'2024-06-15',dateEnd:'2024-06-20',review:''},
-    {id:3,title:'나의 해방일지',cat:'drama',status:'done',author:'',director:'박해영',actors:['손석구','이지은'],genres:['드라마','로맨스'],date:'2023-11-05',dateEnd:'',review:'염미정의 대사들이 오래 남았다.'},
-    {id:4,title:'작은 땅의 야수들',cat:'book',status:'done',author:'김주혜',director:'',actors:[],genres:['소설'],date:'2025-01-05',dateEnd:'2025-01-14',review:''},
-    {id:5,title:'콘크리트 유토피아',cat:'movie',status:'want',author:'',director:'엄태화',actors:['이병헌','박서준','박보영'],genres:['드라마','SF'],date:'',dateEnd:'',review:''},
-    {id:6,title:'남아있는 나날',cat:'book',status:'reading',author:'가즈오 이시구로',director:'',actors:[],genres:['소설'],date:'2025-05-01',dateEnd:'',review:''},
-  ];}
-
-  let items=loadItems();
-  let nextId=Math.max(...items.map(i=>i.id),0)+1;
+  let items=[];
   let filter='all',activeTab='list',creatorTab='all',listQ='',creatorQ='';
   let calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),selectedDate=null;
   let selectedGenres=[],editingId=null;
@@ -323,6 +313,45 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   const stOrder=['want','reading','done'];
   const stIcon={want:'🔖',reading:'📖',done:'✅'};
   const monthNames=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
+  function setSyncStatus(msg){document.getElementById('sync-status').textContent=msg;}
+
+  async function apiFetch(method,body){
+    const res=await fetch('/api/items',{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+    if(!res.ok)throw new Error(await res.text());
+    return res.json();
+  }
+
+  async function loadItems(){
+    try{
+      setSyncStatus('동기화 중...');
+      const data=await apiFetch('GET');
+      items=data.map(normalizeItem);
+      setSyncStatus('✓ 동기화 완료');
+      render();
+    }catch(e){
+      setSyncStatus('⚠ 서버 연결 실패 — 로컬 데이터 사용 중');
+      const local=localStorage.getItem('my-list-items-v1');
+      items=local?JSON.parse(local).map(normalizeItem):[];
+      render();
+    }
+  }
+
+  function normalizeItem(d){
+    return{
+      id:d.id,
+      title:d.title||'',
+      cat:d.cat||'book',
+      status:d.status||'want',
+      author:d.author||'',
+      director:d.director||'',
+      actors:Array.isArray(d.actors)?d.actors:(d.actors?JSON.parse(d.actors):[]),
+      genres:Array.isArray(d.genres)?d.genres:(d.genres?JSON.parse(d.genres):[]),
+      date:d.date||'',
+      dateEnd:d.date_end||d.dateEnd||'',
+      review:d.review||'',
+    };
+  }
 
   function fmtDate(d){if(!d)return'';const[y,m,day]=d.split('-');return`${y}.${m}.${day}`;}
   function dateStr(y,m,d){return`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
@@ -365,7 +394,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     if(q){
       document.getElementById('counts').innerHTML='';
       document.getElementById('list').innerHTML=!filtered.length?`<div class="empty">"${q}" 검색 결과가 없어요</div>`:`<div class="search-result-count">${filtered.length}건 검색됨</div>`+filtered.map(i=>cardHTML(i,false,q)).join('');
-    } else {
+    }else{
       document.getElementById('counts').innerHTML=`
         <div class="count-box"><div class="count-label">전체</div><div class="count-num">${items.length}</div></div>
         <div class="count-box"><div class="count-label">📖 책</div><div class="count-num">${items.filter(i=>i.cat==='book').length}</div></div>
@@ -471,7 +500,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     box.innerHTML=`<div class="ai-result"><div class="ai-result-label">${label}</div><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
     try{
       const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
-      if(!res.ok){const t=await res.text();throw new Error(t||res.status);}
+      if(!res.ok)throw new Error(await res.text());
       const text=await res.text();
       if(!text||text.trim()==='')throw new Error('응답이 비어있어요');
       const data=JSON.parse(text);
@@ -486,24 +515,24 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     else if(type==='now'){const r=[...items].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,4);callAI(`최근 기록:\n${buildListText(r)}\n\n전체:\n${lt}\n\n요즘 내가 무엇을 찾고 있는지 조용하고 따뜻한 시선으로 읽어줘.`,'ai-result-box','💭 요즘 나는');}
     else if(type==='pattern'){if(!ri.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">아직 감상을 적은 항목이 없어요.</div>';return;}callAI(`감상들:\n${ri.map(i=>`- ${i.title}: "${i.review}"`).join('\n')}\n\n패턴 분석해줘. 담담하고 문학적인 문체로.`,'ai-result-box','🔍 감상 패턴 분석');}
     else if(type==='newbook'){
-  const authors=items.filter(i=>i.cat==='book'&&i.author).map(i=>i.author);
-  const directors=items.filter(i=>i.cat!=='book'&&i.director).map(i=>i.director);
-  const names=[...new Set([...authors,...directors])];
-  if(!names.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">목록에 작가/감독 정보가 없어요.</div>';return;}
-  const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
-  callAI(`오늘(${today}) 기준으로 다음 작가/감독들의 최근 신간이나 신작 발표 소식을 알려줘:\n${names.map(n=>`- ${n}`).join('\n')}\n\n각 인물별로 최근 1~2년 내 신작이 있으면 제목, 출판/개봉 시기, 간단한 소개를 알려줘. 없으면 없다고 해줘.`,'ai-result-box','📚 목록 작가 · 감독 신작 소식');
-}
+      const authors=items.filter(i=>i.cat==='book'&&i.author).map(i=>i.author);
+      const directors=items.filter(i=>i.cat!=='book'&&i.director).map(i=>i.director);
+      const names=[...new Set([...authors,...directors])];
+      if(!names.length){document.getElementById('ai-result-box').innerHTML='<div class="ai-result">목록에 작가/감독 정보가 없어요.</div>';return;}
+      const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
+      callAI(`오늘(${today}) 기준으로 다음 작가/감독들의 최근 신간이나 신작 발표 소식을 알려줘:\n${names.map(n=>`- ${n}`).join('\n')}\n\n각 인물별로 최근 1~2년 내 신작이 있으면 제목, 출판/개봉 시기, 간단한 소개를 알려줘.`,'ai-result-box','📚 목록 작가 · 감독 신작 소식');
+    }
   }
 
   function handleContestBtn(type){
     const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
     const labels={all:'🏆 전국 문학 공모전',novel:'📖 소설 · 단편 공모전',essay:'✍️ 수필 · 에세이 공모전',poem:'🪶 시 · 시조 공모전',youth:'🏫 청소년 · 어린이 문학대회'};
     const prompts={
-      all:`오늘(${today}) 기준 현재 접수 중인 전국 문학 공모전을 정리해줘. 소설·수필·시 장르별로 구분해서 공모전 이름, 주최, 마감일, 시상 내역.`,
-      novel:`오늘(${today}) 기준 현재 접수 중인 소설·단편 공모전을 정리해줘. 이름, 주최, 마감일, 분량, 시상 내역.`,
-      essay:`오늘(${today}) 기준 현재 접수 중인 수필·에세이 공모전을 정리해줘. 이름, 주최, 마감일, 시상 내역.`,
-      poem:`오늘(${today}) 기준 현재 접수 중인 시·시조 공모전을 정리해줘. 이름, 주최, 마감일, 시상 내역.`,
-      youth:`오늘(${today}) 기준 현재 접수 중인 청소년·어린이 문학대회를 정리해줘. 이름, 주최, 마감일, 대상 연령, 시상 내역.`,
+      all:`오늘(${today}) 기준 현재 접수 중인 전국 문학 공모전을 정리해줘.`,
+      novel:`오늘(${today}) 기준 현재 접수 중인 소설·단편 공모전을 정리해줘.`,
+      essay:`오늘(${today}) 기준 현재 접수 중인 수필·에세이 공모전을 정리해줘.`,
+      poem:`오늘(${today}) 기준 현재 접수 중인 시·시조 공모전을 정리해줘.`,
+      youth:`오늘(${today}) 기준 현재 접수 중인 청소년·어린이 문학대회를 정리해줘.`,
     };
     callAI(prompts[type],'contest-result',labels[type]);
   }
@@ -559,35 +588,55 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
 
   function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingId=null;}
 
-  function saveItem(){
+  async function saveItem(){
     const title=document.getElementById('inp-title').value.trim();if(!title){document.getElementById('inp-title').focus();return;}
     const cat=document.getElementById('inp-cat').value;
     const actors=document.getElementById('inp-actors').value.split(',').map(a=>a.trim()).filter(Boolean);
-    const data={title,cat,status:document.getElementById('inp-status').value,
+    const data={
+      title,cat,
+      status:document.getElementById('inp-status').value,
       author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
       director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
       actors:!isBookCat(cat)?actors:[],
       genres:[...selectedGenres],
       date:document.getElementById('inp-date').value,
-      dateEnd:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
-      review:document.getElementById('inp-review').value.trim()};
-    if(editingId){
-      const idx=items.findIndex(i=>i.id===editingId);
-      if(idx>-1)items[idx]={...items[idx],...data};
-    } else {
-      items.unshift({id:nextId++,...data});
+      date_end:isBookCat(cat)?document.getElementById('inp-date-end').value:'',
+      review:document.getElementById('inp-review').value.trim(),
+    };
+    closeModal();
+    try{
+      if(editingId){
+        setSyncStatus('저장 중...');
+        const updated=await apiFetch('PUT',{id:editingId,...data});
+        const idx=items.findIndex(i=>i.id===editingId);
+        if(idx>-1)items[idx]=normalizeItem(updated);
+      }else{
+        setSyncStatus('저장 중...');
+        const created=await apiFetch('POST',data);
+        items.unshift(normalizeItem(created));
+      }
+      setSyncStatus('✓ 저장 완료');
+    }catch(e){
+      setSyncStatus('⚠ 저장 실패: '+e.message);
     }
-    saveItems();closeModal();render();
+    render();
     if(activeTab==='status')renderStatus();
     if(activeTab==='creator')renderCreator();
     if(activeTab==='diary')renderCalendar();
   }
 
-  function deleteItem(id){
-    items=items.filter(i=>i.id!==id);saveItems();render();
+  async function deleteItem(id){
+    items=items.filter(i=>i.id!==id);render();
     if(activeTab==='status')renderStatus();
     if(activeTab==='creator')renderCreator();
     if(activeTab==='diary')renderCalendar();
+    try{
+      setSyncStatus('삭제 중...');
+      await apiFetch('DELETE',{id});
+      setSyncStatus('✓ 삭제 완료');
+    }catch(e){
+      setSyncStatus('⚠ 삭제 실패: '+e.message);
+    }
   }
 
   document.getElementById('open-modal-btn').addEventListener('click',openModal);
@@ -614,7 +663,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     const cb=e.target.closest('[data-contestbtn]');if(cb)handleContestBtn(cb.dataset.contestbtn);
   });
 
-  render();
+  loadItems();
 })();
 </script>
 </body>
