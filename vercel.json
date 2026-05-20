@@ -4,12 +4,12 @@
     { "src": "ai.js", "use": "@vercel/node" },
     { "src": "api/items.js", "use": "@vercel/node" },
     { "src": "api/search.js", "use": "@vercel/node" },
-    { "src": "index.html", "use": "@vercel/static" }
+    { "src": "app.html", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/ai", "dest": "/ai.js" },
     { "src": "/api/items", "dest": "/api/items.js" },
     { "src": "/api/search", "dest": "/api/search.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/(.*)", "dest": "/app.html" }
   ]
 }
