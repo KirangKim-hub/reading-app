@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>테스트</title></head>
+<body>
+<div id="result">로딩중...</div>
+<script>
+fetch('/api/items').then(r=>r.json()).then(d=>{
+  document.getElementById('result').textContent = '성공! '+d.length+'개';
+}).catch(e=>{
+  document.getElementById('result').textContent = '실패: '+e.message;
+});
+</script>
+</body>
+</html>
