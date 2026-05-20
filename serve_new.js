@@ -287,11 +287,20 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     </div>
     <div class="field-group" id="group-video" style="display:none;">
       <div class="field-group-label">🎬 영상 정보</div>
+      <div class="field">
+        <label>제목</label>
+        <div class="title-row">
+          <input type="text" id="inp-video-title-search" placeholder="제목 입력 후 자동완성" style="flex:1;" />
+          <button type="button" id="autofill-video-btn" style="flex-shrink:0;padding:8px 12px;font-size:12px;cursor:pointer;white-space:nowrap;">🔍 자동완성</button>
+        </div>
+      </div>
       <div class="field"><label>감독</label><input type="text" id="inp-director" placeholder="예: 봉준호" /></div>
       <div class="field"><label>출연 배우</label>
         <input type="text" id="inp-actors" placeholder="예: 송강호, 이병헌" />
         <div class="field-hint">쉼표로 구분해서 입력하세요</div>
       </div>
+      <div class="field"><label>나라</label><input type="text" id="inp-country" placeholder="예: 한국, 미국" /></div>
+      <div class="field"><label>개봉일자</label><input type="date" id="inp-release-date" /></div>
       <div class="field" style="margin-bottom:0;"><label>장르</label><div class="genre-picker" id="genre-picker-video"></div></div>
     </div>
     <div class="field"><label>감상</label>
@@ -349,7 +358,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   function normalizeItem(d){
     return{
       id:d.id,title:d.title||'',cat:d.cat||'book',status:d.status||'want',
-      author:d.author||'',publisher:d.publisher||'',director:d.director||'',
+      author:d.author||'',publisher:d.publisher||'',director:d.director||'',country:d.country||'',releaseDate:d.release_date||d.releaseDate||'',
       actors:Array.isArray(d.actors)?d.actors:(d.actors?JSON.parse(d.actors):[]),
       genres:Array.isArray(d.genres)?d.genres:(d.genres?JSON.parse(d.genres):[]),
       date:d.date||'',dateEnd:d.date_end||d.dateEnd||'',review:d.review||'',
@@ -376,7 +385,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
         <div class="card-sub">
           \${creator?\`<span>\${creator}</span>\`:''}
           \${creator&&item.date?\`<span>·</span>\`:''}
-          \${item.date?\`<span>\${fmtDate(item.date)}\${item.dateEnd?' ~ '+fmtDate(item.dateEnd):''}</span>\`:''}
+          \${item.date?\`<span>\${fmtDate(item.date)}\${item.dateEnd?' ~ '+fmtDate(item.dateEnd):''}</span>\`:''}          \${!isBookCat(item.cat)&&item.country?\`<span>· \${item.country}</span>\`:''}          \${!isBookCat(item.cat)&&item.releaseDate?\`<span>· 개봉 \${fmtDate(item.releaseDate)}</span>\`:''}
         </div>
         \${genres.length?\`<div class="card-genres">\${genres.map(g=>\`<span class="genre-tag \${tagCls}">\${g}</span>\`).join('')}</div>\`:''}
       </div>
@@ -579,7 +588,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   function openModal(){
     editingId=null;
     document.getElementById('modal-title').textContent='새 항목 추가';
-    ['inp-title','inp-review','inp-date-end','inp-author','inp-publisher','inp-director','inp-actors'].forEach(id=>document.getElementById(id).value='');
+    ['inp-title','inp-review','inp-date-end','inp-author','inp-publisher','inp-director','inp-actors','inp-country','inp-release-date','inp-video-title-search'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('inp-cat').value='book';
     document.getElementById('inp-status').value='want';
     document.getElementById('inp-date').value=new Date().toISOString().split('T')[0];
@@ -601,6 +610,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
     document.getElementById('inp-author').value=item.author||'';
     document.getElementById('inp-publisher').value=item.publisher||'';
     document.getElementById('inp-director').value=item.director||'';
+    document.getElementById('inp-country').value=item.country||'';
+    document.getElementById('inp-release-date').value=item.releaseDate||'';
+    document.getElementById('inp-video-title-search').value='';
+
     document.getElementById('inp-actors').value=(item.actors||[]).join(', ');
     document.getElementById('inp-review').value=item.review||'';
     selectedGenres=[...(item.genres||[])];
@@ -620,6 +633,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
       author:isBookCat(cat)?document.getElementById('inp-author').value.trim():'',
       publisher:isBookCat(cat)?document.getElementById('inp-publisher').value.trim():'',
       director:!isBookCat(cat)?document.getElementById('inp-director').value.trim():'',
+      country:!isBookCat(cat)?document.getElementById('inp-country').value.trim():'',
+      release_date:!isBookCat(cat)?document.getElementById('inp-release-date').value:'',
       actors:!isBookCat(cat)?actors:[],
       genres:[...selectedGenres],
       date:document.getElementById('inp-date').value,
@@ -665,6 +680,23 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-border2); 
   document.getElementById('save-btn').addEventListener('click',saveItem);
   // 바깥 클릭으로 닫히지 않음
   document.getElementById('inp-cat').addEventListener('change',updateModalFields);
+
+  document.getElementById('autofill-video-btn').addEventListener('click',async function(){
+    const title=document.getElementById('inp-video-title-search').value.trim();
+    const cat=document.getElementById('inp-cat').value;
+    if(!title){document.getElementById('inp-video-title-search').focus();return;}
+    this.textContent='검색 중...';this.disabled=true;
+    try{
+      const res=await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,cat})});
+      const data=await res.json();
+      if(data.director)document.getElementById('inp-director').value=data.director;
+      if(data.actors&&data.actors.length)document.getElementById('inp-actors').value=data.actors.join(', ');
+      if(data.country)document.getElementById('inp-country').value=data.country;
+      if(data.release_date)document.getElementById('inp-release-date').value=data.release_date;
+      if(data.genres&&data.genres.length){selectedGenres=data.genres;renderGenrePicker(cat);}
+    }catch(e){alert('자동완성 실패: '+e.message);}
+    this.textContent='🔍 자동완성';this.disabled=false;
+  });
 
   document.getElementById('autofill-btn').addEventListener('click',async function(){
     const title=document.getElementById('inp-title').value.trim();
